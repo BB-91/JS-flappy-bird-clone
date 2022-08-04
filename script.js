@@ -8,10 +8,14 @@ import { Color } from './lib/Color.js';
 
 const gameContainer = document.querySelector("game-container");
 const gameContainerStyle = getComputedStyle(gameContainer);
-const gameArea = new Vector2(
-    parseInt(gameContainerStyle.width),
-    parseInt(gameContainerStyle.height),
-)
+const gameArea = vector2(parseInt(gameContainerStyle.width), parseInt(gameContainerStyle.height))
+const FPS = 60;
+const tickRate = (1.0 / FPS) * 1000;
+const GRAVITY = 1;
+const JUMP_FORCE = -13
+const tick = () => {applyGravity();}
+let physicsInterval;
+// clearInterval(physicsInterval);
 
 const playerGameObj = new GameObj(
     {
@@ -21,32 +25,30 @@ const playerGameObj = new GameObj(
 
 playerGameObj.addToGame();
 
-const GRAVITY = 10;
-const JUMP_FORCE = -13
-const tick = () => {applyGravity();}
-let physicsInterval;
-
 const applyGravity = () => {
-    playerGameObj.offsetPos(vector2(0, GRAVITY));
+    playerGameObj.offsetVelocity(vector2(0, GRAVITY));
+    playerGameObj.offsetPos(playerGameObj.getVelocity);
+
     const playerMaxY = gameArea.getY - playerGameObj.getHeight;
 
     if (playerGameObj.getY > playerMaxY) {
+        playerGameObj.setVelocity = Vector2.ZERO;
         playerGameObj.setY = playerMaxY;
-        console.log("stopping interval")
-        clearInterval(physicsInterval);
+    } else if (playerGameObj.getY < 0) {
+        playerGameObj.setVelocity = Vector2.ZERO;
+        playerGameObj.setY = 0;
     }
 }
 
-
 window.addEventListener("keydown", (event) => {
-    if (event.key == " "){ // spacebar
+    if (event.key == " " && !event.repeat){ // spacebar
         console.log("pressed spacebar.");
+        playerGameObj.setVelocity = vector2(0, JUMP_FORCE)
     }
 })
 
 window.onload = () => {
     setTimeout(() => {
-        // 60 FPS = 1.0/60.0
-        physicsInterval = setInterval(tick, 100); // set tick interveral
+        physicsInterval = setInterval(tick, tickRate); // set tick interveral
     }, 1000); // wait a second for scripts to load
 }
