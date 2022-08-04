@@ -80,16 +80,28 @@ const applyGravity = () => {
 
 /**
  * Check if rectA contains rectB.
- * @param {Rect2} a - origin (top-left position)
- * @param {Rect2} b - width & height
+ * @param {Rect2} a - rectA
+ * @param {Rect2} b - rectB
  */
- function contains(a, b) {
+ const contains = (a, b) => {
 	return (
 		a.getLeft < b.getLeft &&
 		a.getTop < b.getTop &&
 		a.getRight > b.getRight &&
 		a.getBottom > b.getBottom
 	);
+}
+
+
+/**
+ * Check if rectA overlaps rectB.
+ * @param {Rect2} a - rectA
+ * @param {Rect2} b - rectB
+ */
+const overlaps = (a, b) => {
+	if (a.getLeft >= b.getRight || b.getLeft >= a.getRight) {return false;} // no horizontal overlap
+	if (a.getTop >= b.getBottom || b.getTop >= a.getBottom) {return false;} // no vertical overlap
+	return true;
 }
 
 
