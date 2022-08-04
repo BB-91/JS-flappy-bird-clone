@@ -43,10 +43,18 @@ const moveWalls = () => { // move walls toward the left edge of the screen, then
     })
 
     if (shouldPosReset) {
-        console.log("should change hole pos now.")
+        change_hole_pos();
     }
 }
 
+const change_hole_pos = () => {
+    const randomInt = Math.floor(Math.random() * 5000);
+    const holeTop = randomInt % (gameArea.getY - HOLE_HEIGHT + 1);
+    const holeBottom = holeTop + HOLE_HEIGHT;
+    topWall.setHeight = holeTop;
+    bottomWall.setY = holeBottom;
+    bottomWall.setHeight = (gameArea.getY - holeBottom);
+}
 
 const topWall = getNewWall();
 const bottomWall = getNewWall();
