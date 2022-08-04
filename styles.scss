@@ -1,0 +1,22 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+}
+
+game-container {
+    display: block;
+    width: 320px;
+    height: 180px;
+    background-color: black;
+}
+
+sprite-rect {
+    display: inline-block;
+    position: absolute;
+}
