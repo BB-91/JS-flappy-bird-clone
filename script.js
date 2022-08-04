@@ -1,11 +1,17 @@
 "use strict";
-import { assertNotNull, assertInstancesOf, assertWithinRange, getNewElement } from './lib/Util.js';
-import { Vector2 } from './lib/Vector2.js';
+import { assertNotNull, assertInstancesOf, assertWithinRange, getNewElement, crash } from './lib/Util.js';
+// import { Vector2, Vec } from './lib/Vector2.js';
+import { Vector2, vector2 } from './lib/Vector2.js';
 import { Rect2 } from './lib/Rect2.js';
 import { GameObj } from './lib/GameObj.js';
 import { Color } from './lib/Color.js';
 
 const gameContainer = document.querySelector("game-container");
+const gameContainerStyle = getComputedStyle(gameContainer);
+const gameArea = new Vector2(
+    parseInt(gameContainerStyle.width),
+    parseInt(gameContainerStyle.height),
+)
 
 const playerGameObj = new GameObj(
     {
@@ -15,27 +21,24 @@ const playerGameObj = new GameObj(
 
 playerGameObj.addToGame();
 
-playerGameObj.setX = 20;
-playerGameObj.setY = 30;
-playerGameObj.setPos = new Vector2(40, 60);
+const GRAVITY = 10;
+const tick = () => {applyGravity();}
+let physicsInterval;
 
-const getPos = (element) => {
-    if (!element) {crash(`Error: ${element}`);}
-    if (!element instanceof HTMLElement) {crash(`Not an HTMLElement: ${element}`)}
-    return element.style.position;
+const applyGravity = () => {
+    playerGameObj.offsetPos(vector2(0, GRAVITY));
+    const playerMaxY = gameArea.getY - playerGameObj.getHeight;
+
+    if (playerGameObj.getY > playerMaxY) {
+        playerGameObj.setY = playerMaxY;
+        console.log("stopping interval")
+        clearInterval(physicsInterval);
+    }
 }
 
-
-const GRAVITY = 1;
-
-// 60 FPS = 1.0/60.0
-
-// const tick = () => {
-//     console.log("tick");
-// }
-
-// window.onload = () => {
-//     setInterval(() => {
-//         tick();
-//     }, 1000);
-// }
+window.onload = () => {
+    setTimeout(() => {
+        // 60 FPS = 1.0/60.0
+        physicsInterval = setInterval(tick, 100); // set tick interveral
+    }, 1000); // wait a second for scripts to load
+}
