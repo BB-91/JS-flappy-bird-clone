@@ -16,12 +16,13 @@ const gameArea = new Vector2(
 const playerGameObj = new GameObj(
     {
         rect2: new Rect2(Vector2.ZERO, new Vector2(16, 16)),
-        backgroundColor: Color.WHITE,
+        backgroundColor: Color.RED,
     })
 
 playerGameObj.addToGame();
 
 const GRAVITY = 10;
+const JUMP_FORCE = -13
 const tick = () => {applyGravity();}
 let physicsInterval;
 
@@ -35,6 +36,13 @@ const applyGravity = () => {
         clearInterval(physicsInterval);
     }
 }
+
+
+window.addEventListener("keydown", (event) => {
+    if (event.key == " "){ // spacebar
+        console.log("pressed spacebar.");
+    }
+})
 
 window.onload = () => {
     setTimeout(() => {
