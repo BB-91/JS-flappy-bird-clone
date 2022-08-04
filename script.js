@@ -10,12 +10,15 @@ const FPS = 60;
 const tickRate = (1.0 / FPS) * 1000;
 const GRAVITY = 1;
 const JUMP_FORCE = -10;
-const tick = () => {applyGravity();}
+const tick = () => {
+    applyGravity();
+    moveWalls();
+}
 let physicsInterval;
 // clearInterval(physicsInterval);
 
 const WALL_WIDTH = 16
-const WALL_SPEED = -20 // wall movement speed
+const WALL_SPEED = -5 // wall movement speed
 const HOLE_HEIGHT = 85 // height of gap between walls
 
 const playerGameObj = new GameObj({ rect2: rect2(Vector2.ZERO, vector2(16, 16)), backgroundColor: Color.WHITE })
@@ -27,6 +30,22 @@ const getNewWall = () => {
             backgroundColor: Color.RED,
         });
     }
+
+const moveWalls = () => { // move walls toward the left edge of the screen, then reset position when offscreen
+    let shouldPosReset = false;
+    walls.forEach(wall => {
+        if (wall.getX <= -WALL_WIDTH) { // if wall offscreen (left side)
+            wall.setX = gameArea.getX + WALL_WIDTH // move wall offscreen (right side)
+            shouldPosReset = true;
+        } else {
+            wall.offsetPos(vector2(WALL_SPEED, 0));
+        }
+    })
+
+    if (shouldPosReset) {
+        console.log("should change hole pos now.")
+    }
+}
 
 
 const topWall = getNewWall();
