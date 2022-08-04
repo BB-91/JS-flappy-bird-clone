@@ -92,7 +92,6 @@ const applyGravity = () => {
 	);
 }
 
-
 /**
  * Check if rectA overlaps rectB.
  * @param {Rect2} a - rectA
@@ -101,6 +100,17 @@ const applyGravity = () => {
 const overlaps = (a, b) => {
 	if (a.getLeft >= b.getRight || b.getLeft >= a.getRight) {return false;} // no horizontal overlap
 	if (a.getTop >= b.getBottom || b.getTop >= a.getBottom) {return false;} // no vertical overlap
+	return true;
+}
+
+/**
+ * Check if rectA touches rectB.
+ * @param {Rect2} a - rectA
+ * @param {Rect2} b - rectB
+ */
+const touches = (a, b) => {
+	if (a.getLeft > b.getRight || b.getLeft > a.getRight) {return false;} // has horizontal gap
+	if (a.getTop > b.getBottom || b.getTop > a.getBottom) {return false;} // has vertical gap
 	return true;
 }
 
