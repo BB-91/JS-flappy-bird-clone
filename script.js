@@ -78,11 +78,27 @@ const applyGravity = () => {
     }
 }
 
+/**
+ * Check if rectA contains rectB.
+ * @param {Rect2} a - origin (top-left position)
+ * @param {Rect2} b - width & height
+ */
+ function contains(a, b) {
+	return (
+		a.getLeft < b.getLeft &&
+		a.getTop < b.getTop &&
+		a.getRight > b.getRight &&
+		a.getBottom > b.getBottom
+	);
+}
+
+
 window.addEventListener("keydown", (event) => {
     if (event.key == " " && !event.repeat){ // spacebar
         playerGameObj.setVelocity = vector2(0, JUMP_FORCE)
     }
 })
+
 
 window.onload = () => {
     setTimeout(() => {
