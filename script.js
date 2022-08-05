@@ -30,7 +30,7 @@ const WALL_SPEED = -8 // wall movement speed
 const HOLE_HEIGHT = 85 // height of gap between walls
 const WALL_SPAWN_X_POS = gameArea.getX + WALL_WIDTH;
 
-const player = new GameObj({ rect2: rect2(Vector2.ZERO, vector2(16, 16)), backgroundColor: Color.WHITE })
+const player = new GameObj({ rect2: rect2(vector2(4, 4), vector2(16, 16)), backgroundColor: Color.WHITE })
 
 /** @return {GameObj} get a Wall GameObj */
 const getNewWall = () => {
