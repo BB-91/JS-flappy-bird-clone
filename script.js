@@ -1,5 +1,5 @@
 "use strict";
-import { assertNotNull, assertInstancesOf, assertWithinRange, getNewElement, crash, assertDifferentObjects, count } from './lib/Util.js';
+import { assertNotNull, assertInstancesOf, assertWithinRange, getNewElement, crash, assertDifferentObjects, count, assertIncludes } from './lib/Util.js';
 import { Vector2, vector2 } from './lib/Vector2.js';
 import { Rect2, rect2 } from './lib/Rect2.js';
 import { Color, color } from './lib/Color.js';
@@ -9,17 +9,58 @@ import * as Physics from './lib/Physics.js';
 import { createMenu } from './lib/GameBtn.js';
 
 
-const isCeilingLethal = true;
-const isFloorLethal = true;
+
 const FPS = 60;
 const tickRate = (1.0 / FPS) * 1000;
 const GRAVITY = 1;
 const JUMP_FORCE = -10;
 
 const WALL_WIDTH = 16;
-const WALL_SPEED = -8; // wall movement speed
 const HOLE_HEIGHT = 85; // height of gap between walls
 const WALL_SPAWN_X_POS = gameArea.getX + WALL_WIDTH;
+
+const PLAYER_START_POS = vector2(4, 4);
+
+const DIFFICULTY = {
+    Easy: "Easy",
+    Medium: "Medium",
+    Hard: "Hard",
+    Insane: "Insane",
+}
+
+let currentDifficulty = DIFFICULTY.Easy;
+let wallSpeed = -8; // wall movement speed
+let isFloorLethal = true;
+let isCeilingLethal = true;
+
+const setDifficulty = (difficulty) => {
+    assertIncludes(DIFFICULTY, difficulty);
+
+    const setLethalityAndWallSpeed = (bool, speed) => {
+        isFloorLethal = bool;
+        isCeilingLethal = bool;
+        wallSpeed = speed;
+    }
+
+    switch (difficulty) {
+        case DIFFICULTY.Easy:
+            setLethalityAndWallSpeed(false, -4);
+            break;
+        case DIFFICULTY.Medium:
+            setLethalityAndWallSpeed(true, -6);
+            break;
+        case DIFFICULTY.Hard:
+            setLethalityAndWallSpeed(true, -8);
+            break;
+        case DIFFICULTY.Insane:
+            setLethalityAndWallSpeed(true, -10);
+            break;
+        default:
+            crash("Invalid case", difficulty);
+    }
+
+    currentDifficulty = difficulty;
+}
 
 const mainMenu = createMenu("DIFFICULTY", "Easy", "Medium", "Hard");
 
@@ -67,7 +108,7 @@ const moveWalls = () => { // move walls toward the left edge of the screen, then
             wall.setX = WALL_SPAWN_X_POS // move wall offscreen (right side)
             shouldPosReset = true;
         } else {
-            wall.offsetPos(vector2(WALL_SPEED, 0));
+            wall.offsetPos(vector2(wallSpeed, 0));
         }
     })
 
@@ -145,6 +186,7 @@ window.onresize = () => {
 
 window.onload = () => {
     updateScaling();
+    setDifficulty(currentDifficulty);
     setTimeout(() => {
         physicsInterval = setInterval(tick, tickRate); // set tick interveral
     }, 1000); // wait a second for scripts to load
