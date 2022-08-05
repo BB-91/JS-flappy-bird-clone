@@ -1,12 +1,26 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: "Press Start 2P";
+    font-size: 12px;
 }
 
 body {
     width: 100vw;
     height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+}
+
+button {
+    padding: auto;
+    margin: auto;
 }
 
 game-container {
@@ -14,6 +28,8 @@ game-container {
     width: 320px;
     height: 180px;
     background-color: black;
+    overflow: hidden;
+    position: absolute;
 }
 
 sprite-rect {

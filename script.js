@@ -26,7 +26,7 @@ const tick = () => {
 let physicsInterval;
 
 const WALL_WIDTH = 16
-const WALL_SPEED = -5 // wall movement speed
+const WALL_SPEED = -8 // wall movement speed
 const HOLE_HEIGHT = 85 // height of gap between walls
 const WALL_SPAWN_X_POS = gameArea.getX + WALL_WIDTH;
 
