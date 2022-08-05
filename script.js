@@ -4,7 +4,7 @@ import { Vector2, vector2 } from './lib/Vector2.js';
 import { Rect2, rect2 } from './lib/Rect2.js';
 import { Color, color } from './lib/Color.js';
 import { GameObj } from './lib/GameObj.js';
-import { gameArea } from './lib/Game.js';
+import { gameArea, gameContainer } from './lib/Game.js';
 import * as Physics from './lib/Physics.js';
 
 const FPS = 60;
@@ -99,8 +99,27 @@ window.addEventListener("keydown", (event) => {
     }
 })
 
+const updateScaling = () => {
+    const widthToHeightRatio = 0.5625 //  (native resolution: 320x180 -- 16:9) (9/16 = 0.5625)
+    const heightToWidthRatio = 1.7778; // (16/9)
+    let xScale = window.innerWidth/gameArea.getX;
+    let scaledWidth = gameArea.getX * xScale;
+    const scaledHeight = scaledWidth * widthToHeightRatio;
+    if (window.innerHeight < scaledHeight) {
+        scaledWidth = window.innerHeight * heightToWidthRatio;
+        xScale = scaledWidth / 320;
+    }
+
+    const paddingMultiplier = 1.0; // 1.0 = max width/height (maintaining aspect ratio), < 1.0 = padding
+    gameContainer.style.transform = `scale(${xScale * paddingMultiplier})`
+}
+
+window.onresize = () => {
+    updateScaling();
+}
 
 window.onload = () => {
+    updateScaling();
     setTimeout(() => {
         physicsInterval = setInterval(tick, tickRate); // set tick interveral
     }, 1000); // wait a second for scripts to load

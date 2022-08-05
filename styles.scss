@@ -1,6 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
-
 * {
     margin: 0;
     padding: 0;
@@ -16,6 +15,8 @@ body {
     justify-content: center;
     align-content: center;
     align-items: center;
+    overflow: hidden; // prevent scrollbars
+    background-color: rgb(19, 19, 19);
 }
 
 button {
@@ -27,9 +28,9 @@ game-container {
     display: block;
     width: 320px;
     height: 180px;
-    background-color: black;
     overflow: hidden;
     position: absolute;
+    background-color: black;
 }
 
 sprite-rect {
