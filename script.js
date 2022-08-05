@@ -1,10 +1,11 @@
 "use strict";
-import { assertNotNull, assertInstancesOf, assertWithinRange, getNewElement, crash } from './lib/Util.js';
+import { assertNotNull, assertInstancesOf, assertWithinRange, getNewElement, crash, assertDifferentObjects, count } from './lib/Util.js';
 import { Vector2, vector2 } from './lib/Vector2.js';
 import { Rect2, rect2 } from './lib/Rect2.js';
 import { Color, color } from './lib/Color.js';
 import { GameObj } from './lib/GameObj.js';
 import { gameArea } from './lib/Game.js';
+import * as Physics from './lib/Physics.js';
 
 const FPS = 60;
 const tickRate = (1.0 / FPS) * 1000;
@@ -13,15 +14,23 @@ const JUMP_FORCE = -10;
 const tick = () => {
     applyGravity();
     moveWalls();
+    for (let i = 0; i < walls.length; i++) {
+        const wall = walls[i];
+        if (wall.touches(player)) {
+            clearInterval(physicsInterval);
+            console.log("HIT DETECTED! GAME OVER!")
+            break;
+        }
+    }
 }
 let physicsInterval;
-// clearInterval(physicsInterval);
 
 const WALL_WIDTH = 16
 const WALL_SPEED = -5 // wall movement speed
 const HOLE_HEIGHT = 85 // height of gap between walls
+const WALL_SPAWN_X_POS = gameArea.getX + WALL_WIDTH;
 
-const playerGameObj = new GameObj({ rect2: rect2(Vector2.ZERO, vector2(16, 16)), backgroundColor: Color.WHITE })
+const player = new GameObj({ rect2: rect2(Vector2.ZERO, vector2(16, 16)), backgroundColor: Color.WHITE })
 
 const getNewWall = () => {
     return new GameObj(
@@ -35,7 +44,7 @@ const moveWalls = () => { // move walls toward the left edge of the screen, then
     let shouldPosReset = false;
     walls.forEach(wall => {
         if (wall.getX <= -WALL_WIDTH) { // if wall offscreen (left side)
-            wall.setX = gameArea.getX + WALL_WIDTH // move wall offscreen (right side)
+            wall.setX = WALL_SPAWN_X_POS // move wall offscreen (right side)
             shouldPosReset = true;
         } else {
             wall.offsetPos(vector2(WALL_SPEED, 0));
@@ -60,64 +69,32 @@ const topWall = getNewWall();
 const bottomWall = getNewWall();
 const walls = [topWall, bottomWall];
 
-[playerGameObj, topWall, bottomWall].forEach(obj => {obj.addToGame();})
+[player, topWall, bottomWall].forEach(obj => {
+    obj.addToGame();
+})
 
 bottomWall.setY = bottomWall.getMaxY;
-walls.forEach(wall => {wall.setX = 40;})
+
+walls.forEach(wall => {
+    wall.setX = WALL_SPAWN_X_POS;
+})
 
 const applyGravity = () => {
-    playerGameObj.offsetVelocity(vector2(0, GRAVITY));
-    playerGameObj.offsetPos(playerGameObj.getVelocity);
+    player.offsetVelocity(vector2(0, GRAVITY));
+    player.offsetPos(player.getVelocity);
 
-    if (playerGameObj.getY > playerGameObj.getMaxY) {
-        playerGameObj.setVelocity = Vector2.ZERO;
-        playerGameObj.setY = playerGameObj.getMaxY;
-    } else if (playerGameObj.getY < 0) {
-        playerGameObj.setVelocity = Vector2.ZERO;
-        playerGameObj.setY = 0;
+    if (player.getY > player.getMaxY) {
+        player.setVelocity = Vector2.ZERO;
+        player.setY = player.getMaxY;
+    } else if (player.getY < 0) {
+        player.setVelocity = Vector2.ZERO;
+        player.setY = 0;
     }
 }
 
-/**
- * Check if rectA contains rectB.
- * @param {Rect2} a - rectA
- * @param {Rect2} b - rectB
- */
- const contains = (a, b) => {
-	return (
-		a.getLeft < b.getLeft &&
-		a.getTop < b.getTop &&
-		a.getRight > b.getRight &&
-		a.getBottom > b.getBottom
-	);
-}
-
-/**
- * Check if rectA overlaps rectB.
- * @param {Rect2} a - rectA
- * @param {Rect2} b - rectB
- */
-const overlaps = (a, b) => {
-	if (a.getLeft >= b.getRight || b.getLeft >= a.getRight) {return false;} // no horizontal overlap
-	if (a.getTop >= b.getBottom || b.getTop >= a.getBottom) {return false;} // no vertical overlap
-	return true;
-}
-
-/**
- * Check if rectA touches rectB.
- * @param {Rect2} a - rectA
- * @param {Rect2} b - rectB
- */
-const touches = (a, b) => {
-	if (a.getLeft > b.getRight || b.getLeft > a.getRight) {return false;} // has horizontal gap
-	if (a.getTop > b.getBottom || b.getTop > a.getBottom) {return false;} // has vertical gap
-	return true;
-}
-
-
 window.addEventListener("keydown", (event) => {
     if (event.key == " " && !event.repeat){ // spacebar
-        playerGameObj.setVelocity = vector2(0, JUMP_FORCE)
+        player.setVelocity = vector2(0, JUMP_FORCE)
     }
 })
 
