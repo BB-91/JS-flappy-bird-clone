@@ -1,10 +1,14 @@
-@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Rubik&display=swap");
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Press Start 2P";
+  font-family: "Rubik", sans-serif;
   font-size: 12px;
+}
+
+:root {
+  --pulse-speed: 0.5s;
 }
 
 body {
@@ -18,11 +22,6 @@ body {
   background-color: rgb(19, 19, 19);
 }
 
-button {
-  padding: auto;
-  margin: auto;
-}
-
 game-container {
   display: block;
   width: 320px;
@@ -30,9 +29,73 @@ game-container {
   overflow: hidden;
   position: absolute;
   background-color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 sprite-rect {
   display: inline-block;
   position: absolute;
+}
+
+menu-container {
+  position: absolute;
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: 4px;
+  padding: 5px;
+}
+
+game-label,
+game-btn {
+  color: black;
+  background-color: white;
+  text-align: center;
+  display: grid;
+  grid-template-columns: 1fr;
+  justify-content: center;
+  align-content: center;
+  border: 2px solid black;
+  border-radius: 5px;
+  padding: 0.2em 2em;
+  font-weight: bold;
+}
+
+game-label {
+  border: 2px solid red;
+  box-shadow: 2px 2px 0px inset black, 2px -2px 0px inset black, -2px 2px 0px inset black, -2px -2px 0px inset black;
+}
+game-label:hover {
+  cursor: default;
+}
+
+game-btn:hover {
+  cursor: pointer;
+  font-weight: bold;
+  animation: pulse-border-color var(--pulse-speed) ease-in-out 0s infinite, pulse-text-shadow var(--pulse-speed) ease-in-out 0s infinite;
+  box-shadow: 2px 2px 0px inset black, 2px -2px 0px inset black, -2px 2px 0px inset black, -2px -2px 0px inset black;
+}
+
+@keyframes pulse-border-color {
+  0% {
+    border-color: rgb(255, 0, 0);
+  }
+  50% {
+    border-color: rgb(220, 0, 0);
+  }
+  100% {
+    border-color: rgb(255, 0, 0);
+  }
+}
+@keyframes pulse-text-shadow {
+  0% {
+    text-shadow: 0px 0px 0px black;
+  }
+  50% {
+    text-shadow: 0px 0px 0px transparent;
+  }
+  100% {
+    text-shadow: 0px 0px 0px black;
+  }
 }/*# sourceMappingURL=styles.css.map */

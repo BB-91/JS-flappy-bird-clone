@@ -6,6 +6,8 @@ import { Color, color } from './lib/Color.js';
 import { GameObj } from './lib/GameObj.js';
 import { gameArea, gameContainer } from './lib/Game.js';
 import * as Physics from './lib/Physics.js';
+import { createMenu } from './lib/GameBtn.js';
+
 
 const isCeilingLethal = true;
 const isFloorLethal = true;
@@ -14,10 +16,16 @@ const tickRate = (1.0 / FPS) * 1000;
 const GRAVITY = 1;
 const JUMP_FORCE = -10;
 
-const WALL_WIDTH = 16
-const WALL_SPEED = -8 // wall movement speed
-const HOLE_HEIGHT = 85 // height of gap between walls
+const WALL_WIDTH = 16;
+const WALL_SPEED = -8; // wall movement speed
+const HOLE_HEIGHT = 85; // height of gap between walls
 const WALL_SPAWN_X_POS = gameArea.getX + WALL_WIDTH;
+
+const mainMenu = createMenu("DIFFICULTY", "Easy", "Medium", "Hard");
+
+const setMainMenuVisible = (bool) => {
+    mainMenu.style.display = bool ? "grid" : "none";
+}
 
 let physicsInterval;
 
@@ -25,8 +33,9 @@ const player = new GameObj({ rect2: rect2(vector2(4, 4), vector2(16, 16)), backg
 
 const endGame = (message) => {
     clearInterval(physicsInterval);
+    setMainMenuVisible(true);
     console.log(message);
-    alert(message);
+    // alert(message);
 }
 
 const tick = () => {
@@ -140,3 +149,7 @@ window.onload = () => {
         physicsInterval = setInterval(tick, tickRate); // set tick interveral
     }, 1000); // wait a second for scripts to load
 }
+
+
+setMainMenuVisible(false);
+gameContainer.appendChild(mainMenu);
