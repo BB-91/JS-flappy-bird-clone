@@ -32,6 +32,7 @@ const WALL_SPAWN_X_POS = gameArea.getX + WALL_WIDTH;
 
 const player = new GameObj({ rect2: rect2(Vector2.ZERO, vector2(16, 16)), backgroundColor: Color.WHITE })
 
+/** @return {GameObj} get a Wall GameObj */
 const getNewWall = () => {
     return new GameObj(
         { 
