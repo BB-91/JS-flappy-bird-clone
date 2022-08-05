@@ -7,30 +7,40 @@ import { GameObj } from './lib/GameObj.js';
 import { gameArea, gameContainer } from './lib/Game.js';
 import * as Physics from './lib/Physics.js';
 
+const isCeilingLethal = true;
+const isFloorLethal = true;
 const FPS = 60;
 const tickRate = (1.0 / FPS) * 1000;
 const GRAVITY = 1;
 const JUMP_FORCE = -10;
-const tick = () => {
-    applyGravity();
-    moveWalls();
-    for (let i = 0; i < walls.length; i++) {
-        const wall = walls[i];
-        if (wall.touches(player)) {
-            clearInterval(physicsInterval);
-            console.log("HIT DETECTED! GAME OVER!")
-            break;
-        }
-    }
-}
-let physicsInterval;
 
 const WALL_WIDTH = 16
 const WALL_SPEED = -8 // wall movement speed
 const HOLE_HEIGHT = 85 // height of gap between walls
 const WALL_SPAWN_X_POS = gameArea.getX + WALL_WIDTH;
 
+let physicsInterval;
+
 const player = new GameObj({ rect2: rect2(vector2(4, 4), vector2(16, 16)), backgroundColor: Color.WHITE })
+
+const endGame = (message) => {
+    clearInterval(physicsInterval);
+    console.log(message);
+    alert(message);
+}
+
+const tick = () => {
+    applyGravity();
+    moveWalls();
+    for (let i = 0; i < walls.length; i++) {
+        const wall = walls[i];
+        if (wall.touches(player)) {
+            endGame("Collided with wall. Game Over.");
+            break;
+        }
+    }
+}
+
 
 /** @return {GameObj} get a Wall GameObj */
 const getNewWall = () => {
@@ -87,9 +97,15 @@ const applyGravity = () => {
     if (player.getY > player.getMaxY) {
         player.setVelocity = Vector2.ZERO;
         player.setY = player.getMaxY;
+        if (isCeilingLethal) {
+            endGame("Collided with ceiling. Game Over.");
+        }
     } else if (player.getY < 0) {
         player.setVelocity = Vector2.ZERO;
         player.setY = 0;
+        if (isFloorLethal) {
+            endGame("Collided with floor. Game Over.");
+        }
     }
 }
 
