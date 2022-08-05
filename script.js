@@ -13,13 +13,13 @@ import { createMenu } from './lib/GameBtn.js';
 const FPS = 60;
 const tickRate = (1.0 / FPS) * 1000;
 const GRAVITY = 1;
-const JUMP_FORCE = -10;
+const JUMP_FORCE = -8;
 
 const WALL_WIDTH = 16;
 const HOLE_HEIGHT = 85; // height of gap between walls
 const WALL_SPAWN_X_POS = gameArea.getX + WALL_WIDTH;
 
-const PLAYER_START_POS = vector2(4, 4);
+const PLAYER_START_POS = vector2(4, 64);
 
 const DIFFICULTY = {
     Easy: "Easy",
@@ -62,7 +62,7 @@ const setDifficulty = (difficulty) => {
     currentDifficulty = difficulty;
 }
 
-const mainMenu = createMenu("DIFFICULTY", "Easy", "Medium", "Hard");
+const mainMenu = createMenu("DIFFICULTY", ...Object.values(DIFFICULTY));
 
 const setMainMenuVisible = (bool) => {
     mainMenu.style.display = bool ? "grid" : "none";
@@ -70,7 +70,7 @@ const setMainMenuVisible = (bool) => {
 
 let physicsInterval;
 
-const player = new GameObj({ rect2: rect2(vector2(4, 4), vector2(16, 16)), backgroundColor: Color.WHITE })
+const player = new GameObj({ rect2: rect2(PLAYER_START_POS, vector2(16, 16)), backgroundColor: Color.WHITE })
 
 const endGame = (message) => {
     clearInterval(physicsInterval);
