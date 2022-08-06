@@ -57,7 +57,7 @@ const PLAYER_IMAGE_PATH = "./images/FloppyDisk.png"
 
 let physicsInterval;
 
-const player = new GameObj({ rect2: rect2(PLAYER_START_POS, vector2(16, 16)), imgSrc: PLAYER_IMAGE_PATH, backgroundColor: Color.WHITE })
+const player = new GameObj({ id: "player", rect2: rect2(PLAYER_START_POS, vector2(16, 16)), imgSrc: PLAYER_IMAGE_PATH, backgroundColor: Color.WHITE })
 
 const endGame = (message) => {
     clearInterval(physicsInterval);
@@ -78,40 +78,52 @@ const tick = () => {
 }
 
 
-/** @return {GameObj} get a Wall GameObj */
-const getNewWall = () => {
+/** 
+ * @param {string} wallID
+ * @return {GameObj} get a Wall GameObj 
+ * 
+*/
+const getNewWall = (wallID) => {
     return new GameObj(
         { 
+            id: wallID,
             rect2: rect2(Vector2.ZERO, vector2(WALL_WIDTH, (gameArea.getY - HOLE_HEIGHT) / 2.0)),
             backgroundColor: Color.RED,
         });
     }
 
+// /** 
+//  * @param {boolean} isFloorObj
+//  * @return {GameObj} Get a new Floor or Ceiling GameObj
+// */
+
+
 /** 
- * @param {boolean} isFloorObj
+ * @param {string} ceilingOrFloorID
  * @return {GameObj} Get a new Floor or Ceiling GameObj
 */
-const getNewFloorOrCeiling = (isFloorObj) => {
+const getNewFloorOrCeiling = (ceilingOrFloorID) => {
+    if (!["floor", "ceiling"].includes(ceilingOrFloorID)) {crash("Invalid id", ceilingOrFloorID);}
+
     const obj = new GameObj(
         { 
+            id: ceilingOrFloorID,
             rect2: rect2(Vector2.ZERO, vector2(gameArea.getX, FLOOR_HEIGHT)),
             backgroundColor: Color.RED,
         });
 
-
-    if (isFloorObj) {
+    if (ceilingOrFloorID == "floor") {
         obj.setY = obj.getMaxY;
     }
 
     return obj;
 }
 
-const floor = getNewFloorOrCeiling(true);
-const ceiling = getNewFloorOrCeiling(false);
-const topWall = getNewWall();
-const bottomWall = getNewWall();
+const floor = getNewFloorOrCeiling("floor");
+const ceiling = getNewFloorOrCeiling("ceiling");
+const topWall = getNewWall("top-wall");
+const bottomWall = getNewWall("bottom-wall");
 const walls = [topWall, bottomWall];
-
 
 const setDifficulty = (difficulty) => {
     assertIncludes(difficulty, DIFFICULTY);
@@ -163,7 +175,7 @@ const moveWalls = () => { // move walls toward the left edge of the screen, then
 }
 
 const change_hole_pos = () => {
-    const MIN_WALL_HEIGHT = 4;
+    const MIN_WALL_HEIGHT = 8;
     const SPACER = PLAYER_PIXEL_OUTLINE_THICKNESS + 1; // offscreen padding for disabled walls to prevent collision
     const randomInt = Math.floor(Math.random() * 5000);
     let holeTop = randomInt % (gameArea.getY - HOLE_HEIGHT + 1);
