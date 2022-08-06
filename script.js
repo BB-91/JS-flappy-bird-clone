@@ -48,24 +48,24 @@ let isCeilingLethal = true;
 const setDifficulty = (difficulty) => {
     assertIncludes(difficulty, DIFFICULTY);
 
-    const setLethalityAndWallSpeed = (bool, speed) => {
-        isFloorLethal = bool;
-        isCeilingLethal = bool;
+    const setLethalityAndWallSpeed = (_isFloorLethal, _isCeilingLethal, speed) => {
+        isFloorLethal = _isFloorLethal;
+        isCeilingLethal = _isCeilingLethal;
         wallSpeed = speed;
     }
 
     switch (difficulty) {
         case DIFFICULTY.Easy:
-            setLethalityAndWallSpeed(false, -4);
+            setLethalityAndWallSpeed(false, false, -4);
             break;
         case DIFFICULTY.Medium:
-            setLethalityAndWallSpeed(true, -6);
+            setLethalityAndWallSpeed(false, true, -6);
             break;
         case DIFFICULTY.Hard:
-            setLethalityAndWallSpeed(true, -8);
+            setLethalityAndWallSpeed(true, true, -8);
             break;
         case DIFFICULTY.Insane:
-            setLethalityAndWallSpeed(true, -10);
+            setLethalityAndWallSpeed(true, true, -10);
             break;
         default:
             crash("Invalid case", difficulty);
@@ -164,14 +164,14 @@ const applyGravity = () => {
     if (player.getY > player.getMaxY) {
         player.setVelocity = Vector2.ZERO;
         player.setY = player.getMaxY;
-        if (isCeilingLethal) {
-            endGame("Collided with ceiling. Game Over.");
+        if (isFloorLethal) {
+            endGame("Collided with floor. Game Over.");
         }
     } else if (player.getY < 0) {
         player.setVelocity = Vector2.ZERO;
         player.setY = 0;
-        if (isFloorLethal) {
-            endGame("Collided with floor. Game Over.");
+        if (isCeilingLethal) {
+            endGame("Collided with ceiling. Game Over.");
         }
     }
 }
