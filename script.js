@@ -6,9 +6,13 @@ import { Color, color } from './lib/Color.js';
 import { GameObj } from './lib/GameObj.js';
 import { gameArea, gameContainer } from './lib/Game.js';
 import * as Physics from './lib/Physics.js';
-import { createMenu } from './lib/GameBtn.js';
+import { createMenu, subscribeToBtnClicks } from './lib/GameBtn.js';
 
+const gameBtnClickListener = (btn) => {
+    console.log("recieved notification of btn click!", btn);
+}
 
+subscribeToBtnClicks(gameBtnClickListener);
 
 const FPS = 60;
 const tickRate = (1.0 / FPS) * 1000;
@@ -33,8 +37,10 @@ let wallSpeed = -8; // wall movement speed
 let isFloorLethal = true;
 let isCeilingLethal = true;
 
+
+
 const setDifficulty = (difficulty) => {
-    assertIncludes(DIFFICULTY, difficulty);
+    assertIncludes(difficulty, DIFFICULTY);
 
     const setLethalityAndWallSpeed = (bool, speed) => {
         isFloorLethal = bool;
