@@ -14,6 +14,7 @@ const gameBtnClickListener = (btn) => {
     const btnText = btn.textContent;
     if (objIncludes(btnText, DIFFICULTY)) {
         setDifficulty(btnText);
+        startGame();
     }
 }
 
@@ -71,19 +72,6 @@ const setDifficulty = (difficulty) => {
     }
 
     currentDifficulty = difficulty;
-    console.log("set difficulty to: ", currentDifficulty);
-    setMainMenuVisible(false);
-    if (walls.length) {
-        walls.forEach(wall => {
-            wall.setX = WALL_SPAWN_X_POS;
-        })
-    }
-
-    if (player) {
-        console.log(`player.getPos:`, player.getPos);
-        player.setPos = PLAYER_START_POS;
-        console.log(`player.getPos:`, player.getPos);
-    }
 }
 
 const mainMenu = createMenu("DIFFICULTY", ...Object.values(DIFFICULTY));
@@ -100,7 +88,6 @@ const endGame = (message) => {
     clearInterval(physicsInterval);
     setMainMenuVisible(true);
     console.log(message);
-    // alert(message);
 }
 
 const tick = () => {
@@ -214,12 +201,30 @@ window.onresize = () => {
     updateScaling();
 }
 
+const startGame = () => {
+    setMainMenuVisible(false);
+
+    if (walls.length) {
+        walls.forEach(wall => {
+            wall.setX = WALL_SPAWN_X_POS;
+        })
+    }
+
+    if (player) {
+        player.setPos = PLAYER_START_POS;
+    }
+
+    setTimeout(() => {
+        player.setVelocity = Vector2.ZERO;
+        physicsInterval = setInterval(tick, tickRate); // set tick interveral
+    }, 1000); // wait a second for scripts to load
+    
+}
+
 window.onload = () => {
     updateScaling();
     setDifficulty(currentDifficulty);
-    setTimeout(() => {
-        physicsInterval = setInterval(tick, tickRate); // set tick interveral
-    }, 1000); // wait a second for scripts to load
+    startGame();
 }
 
 
