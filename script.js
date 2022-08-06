@@ -1,5 +1,5 @@
 "use strict";
-import { assertNotNull, assertInstancesOf, assertWithinRange, getNewElement, crash, assertDifferentObjects, count, assertIncludes, objIncludes } from './lib/Util.js';
+import { assertNotNull, assertInstancesOf, assertWithinRange, getNewElement, crash, assertDifferentObjects, count, assertIncludes, objIncludes, getImageSize } from './lib/Util.js';
 import { Vector2, vector2 } from './lib/Vector2.js';
 import { Rect2, rect2 } from './lib/Rect2.js';
 import { Color, color } from './lib/Color.js';
@@ -10,7 +10,6 @@ import { createMenu, subscribeToBtnClicks } from './lib/GameBtn.js';
 
 /**@param {HTMLElement} btn - GameBtn element */
 const gameBtnClickListener = (btn) => {
-    console.log("recieved notification of btn click!", btn);
     const btnText = btn.textContent;
     if (objIncludes(btnText, DIFFICULTY)) {
         setDifficulty(btnText);
@@ -33,6 +32,8 @@ const FLOOR_HEIGHT = 2;
 const CEILING_HEIGHT = FLOOR_HEIGHT;
 
 const PLAYER_START_POS = vector2(4, 64);
+const PLAYER_PIXEL_OUTLINE_THICKNESS = 1; // 1 pixel black outline
+
 
 const DIFFICULTY = {
     Easy: "Easy",
@@ -52,14 +53,16 @@ const setMainMenuVisible = (bool) => {
     mainMenu.style.display = bool ? "grid" : "none";
 }
 
+const PLAYER_IMAGE_PATH = "./images/FloppyDisk.png"
+
 let physicsInterval;
 
-const player = new GameObj({ rect2: rect2(PLAYER_START_POS, vector2(16, 16)), backgroundColor: Color.WHITE })
+const player = new GameObj({ rect2: rect2(PLAYER_START_POS, vector2(16, 16)), imgSrc: PLAYER_IMAGE_PATH, backgroundColor: Color.WHITE })
 
 const endGame = (message) => {
     clearInterval(physicsInterval);
     setMainMenuVisible(true);
-    console.log(message);
+    console.log(`endGame message:`, message);
 }
 
 const tick = () => {
@@ -160,16 +163,35 @@ const moveWalls = () => { // move walls toward the left edge of the screen, then
 }
 
 const change_hole_pos = () => {
+    const MIN_WALL_HEIGHT = 4;
+    const SPACER = PLAYER_PIXEL_OUTLINE_THICKNESS + 1; // offscreen padding for disabled walls to prevent collision
     const randomInt = Math.floor(Math.random() * 5000);
-    const holeTop = randomInt % (gameArea.getY - HOLE_HEIGHT + 1);
-    const holeBottom = holeTop + HOLE_HEIGHT;
-    topWall.setHeight = holeTop;
+    let holeTop = randomInt % (gameArea.getY - HOLE_HEIGHT + 1);
+
+    if (holeTop < MIN_WALL_HEIGHT) { // disable top wall
+        holeTop = -PLAYER_PIXEL_OUTLINE_THICKNESS - 1; 
+        holeTop = -SPACER; 
+        topWall.setHeight = 0; 
+        topWall.setY = holeTop;
+    } else {
+        topWall.setHeight = holeTop;
+        topWall.setY = 0;
+    }
+
+    let holeBottom = holeTop + HOLE_HEIGHT;
+    const testBottomWallHeight = gameArea.getY - holeBottom;
+
+    if (testBottomWallHeight < MIN_WALL_HEIGHT) { // disable bottom wall
+        holeBottom = SPACER;
+        bottomWall.setHeight = 0;
+    } else {
+        bottomWall.setHeight = testBottomWallHeight;
+    }
+
     bottomWall.setY = holeBottom;
-    bottomWall.setHeight = (gameArea.getY - holeBottom);
 }
 
-
-[player, ceiling, floor, topWall, bottomWall].forEach(obj => {
+[ceiling, floor, topWall, bottomWall, player].forEach(obj => {
     obj.addToGame();
 })
 
@@ -183,8 +205,14 @@ const applyGravity = () => {
     player.offsetVelocity(vector2(0, GRAVITY));
     player.offsetPos(player.getVelocity);
 
-    const minY = isCeilingLethal ? CEILING_HEIGHT : 0;
-    const maxY = isFloorLethal ? player.getMaxY - FLOOR_HEIGHT : player.getMaxY;
+    let minY = isCeilingLethal ? CEILING_HEIGHT : 0;
+    let maxY = isFloorLethal ? player.getMaxY - FLOOR_HEIGHT : player.getMaxY;
+
+    minY -= PLAYER_PIXEL_OUTLINE_THICKNESS;
+    maxY += PLAYER_PIXEL_OUTLINE_THICKNESS;
+    /* Looks better if the outline overlaps floor/ceiling during collision.
+        Otherwise, with a black background, it doesn't look like the player is actually touching the floor/ceiling.
+    */
 
     if (player.getY >= maxY) {
         player.setVelocity = Vector2.ZERO;
@@ -220,8 +248,6 @@ const updateScaling = () => {
 
     const paddingMultiplier = 1.0; // 1.0 = max width/height (maintaining aspect ratio), < 1.0 = padding
     gameContainer.style.transform = `scale(${xScale * paddingMultiplier})`
-    console.log(`gameContainer.style.transform:`, gameContainer.style.transform);
-    console.log(`parseFloat(gameContainer.style.transform):`, parseFloat(gameContainer.style.transform));
 }
 
 window.onresize = () => {
