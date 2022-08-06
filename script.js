@@ -1,5 +1,5 @@
 "use strict";
-import { assertNotNull, assertInstancesOf, assertWithinRange, getNewElement, crash, assertDifferentObjects, count, assertIncludes } from './lib/Util.js';
+import { assertNotNull, assertInstancesOf, assertWithinRange, getNewElement, crash, assertDifferentObjects, count, assertIncludes, objIncludes } from './lib/Util.js';
 import { Vector2, vector2 } from './lib/Vector2.js';
 import { Rect2, rect2 } from './lib/Rect2.js';
 import { Color, color } from './lib/Color.js';
@@ -8,8 +8,13 @@ import { gameArea, gameContainer } from './lib/Game.js';
 import * as Physics from './lib/Physics.js';
 import { createMenu, subscribeToBtnClicks } from './lib/GameBtn.js';
 
+/**@param {HTMLElement} btn - GameBtn element */
 const gameBtnClickListener = (btn) => {
     console.log("recieved notification of btn click!", btn);
+    const btnText = btn.textContent;
+    if (objIncludes(btnText, DIFFICULTY)) {
+        setDifficulty(btnText);
+    }
 }
 
 subscribeToBtnClicks(gameBtnClickListener);
@@ -66,6 +71,19 @@ const setDifficulty = (difficulty) => {
     }
 
     currentDifficulty = difficulty;
+    console.log("set difficulty to: ", currentDifficulty);
+    setMainMenuVisible(false);
+    if (walls.length) {
+        walls.forEach(wall => {
+            wall.setX = WALL_SPAWN_X_POS;
+        })
+    }
+
+    if (player) {
+        console.log(`player.getPos:`, player.getPos);
+        player.setPos = PLAYER_START_POS;
+        console.log(`player.getPos:`, player.getPos);
+    }
 }
 
 const mainMenu = createMenu("DIFFICULTY", ...Object.values(DIFFICULTY));
@@ -107,6 +125,14 @@ const getNewWall = () => {
         });
     }
 
+
+
+const topWall = getNewWall();
+const bottomWall = getNewWall();
+const walls = [topWall, bottomWall];
+
+
+
 const moveWalls = () => { // move walls toward the left edge of the screen, then reset position when offscreen
     let shouldPosReset = false;
     walls.forEach(wall => {
@@ -132,9 +158,7 @@ const change_hole_pos = () => {
     bottomWall.setHeight = (gameArea.getY - holeBottom);
 }
 
-const topWall = getNewWall();
-const bottomWall = getNewWall();
-const walls = [topWall, bottomWall];
+
 
 [player, topWall, bottomWall].forEach(obj => {
     obj.addToGame();
