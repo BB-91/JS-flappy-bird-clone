@@ -29,6 +29,9 @@ const WALL_WIDTH = 16;
 const HOLE_HEIGHT = 85; // height of gap between walls
 const WALL_SPAWN_X_POS = gameArea.getX + WALL_WIDTH;
 
+const FLOOR_HEIGHT = 2;
+const CEILING_HEIGHT = FLOOR_HEIGHT;
+
 const PLAYER_START_POS = vector2(4, 64);
 
 const DIFFICULTY = {
@@ -42,37 +45,6 @@ let currentDifficulty = DIFFICULTY.Easy;
 let wallSpeed = -8; // wall movement speed
 let isFloorLethal = true;
 let isCeilingLethal = true;
-
-
-
-const setDifficulty = (difficulty) => {
-    assertIncludes(difficulty, DIFFICULTY);
-
-    const setLethalityAndWallSpeed = (_isFloorLethal, _isCeilingLethal, speed) => {
-        isFloorLethal = _isFloorLethal;
-        isCeilingLethal = _isCeilingLethal;
-        wallSpeed = speed;
-    }
-
-    switch (difficulty) {
-        case DIFFICULTY.Easy:
-            setLethalityAndWallSpeed(false, false, -4);
-            break;
-        case DIFFICULTY.Medium:
-            setLethalityAndWallSpeed(false, true, -6);
-            break;
-        case DIFFICULTY.Hard:
-            setLethalityAndWallSpeed(true, true, -8);
-            break;
-        case DIFFICULTY.Insane:
-            setLethalityAndWallSpeed(true, true, -10);
-            break;
-        default:
-            crash("Invalid case", difficulty);
-    }
-
-    currentDifficulty = difficulty;
-}
 
 const mainMenu = createMenu("DIFFICULTY", ...Object.values(DIFFICULTY));
 
@@ -112,12 +84,63 @@ const getNewWall = () => {
         });
     }
 
+/** 
+ * @param {boolean} isFloorObj
+ * @return {GameObj} Get a new Floor or Ceiling GameObj
+*/
+const getNewFloorOrCeiling = (isFloorObj) => {
+    const obj = new GameObj(
+        { 
+            rect2: rect2(Vector2.ZERO, vector2(gameArea.getX, FLOOR_HEIGHT)),
+            backgroundColor: Color.RED,
+        });
 
 
+    if (isFloorObj) {
+        obj.setY = obj.getMaxY;
+    }
+
+    return obj;
+}
+
+const floor = getNewFloorOrCeiling(true);
+const ceiling = getNewFloorOrCeiling(false);
 const topWall = getNewWall();
 const bottomWall = getNewWall();
 const walls = [topWall, bottomWall];
 
+
+const setDifficulty = (difficulty) => {
+    assertIncludes(difficulty, DIFFICULTY);
+
+    const setLethalityAndWallSpeed = (_isFloorLethal, _isCeilingLethal, speed) => {
+        isFloorLethal = _isFloorLethal;
+        isCeilingLethal = _isCeilingLethal;
+        wallSpeed = speed;
+
+        floor.getElement.style.display = _isFloorLethal ? "inline-block" : "none";
+        ceiling.getElement.style.display = _isCeilingLethal ? "inline-block" : "none";
+    }
+
+    switch (difficulty) {
+        case DIFFICULTY.Easy:
+            setLethalityAndWallSpeed(false, false, -4);
+            break;
+        case DIFFICULTY.Medium:
+            setLethalityAndWallSpeed(false, true, -6);
+            break;
+        case DIFFICULTY.Hard:
+            setLethalityAndWallSpeed(true, true, -8);
+            break;
+        case DIFFICULTY.Insane:
+            setLethalityAndWallSpeed(true, true, -10);
+            break;
+        default:
+            crash("Invalid case", difficulty);
+    }
+
+    currentDifficulty = difficulty;
+}
 
 
 const moveWalls = () => { // move walls toward the left edge of the screen, then reset position when offscreen
@@ -146,8 +169,7 @@ const change_hole_pos = () => {
 }
 
 
-
-[player, topWall, bottomWall].forEach(obj => {
+[player, ceiling, floor, topWall, bottomWall].forEach(obj => {
     obj.addToGame();
 })
 
@@ -161,15 +183,18 @@ const applyGravity = () => {
     player.offsetVelocity(vector2(0, GRAVITY));
     player.offsetPos(player.getVelocity);
 
-    if (player.getY > player.getMaxY) {
+    const minY = isCeilingLethal ? CEILING_HEIGHT : 0;
+    const maxY = isFloorLethal ? player.getMaxY - FLOOR_HEIGHT : player.getMaxY;
+
+    if (player.getY >= maxY) {
         player.setVelocity = Vector2.ZERO;
-        player.setY = player.getMaxY;
+        player.setY = maxY;
         if (isFloorLethal) {
             endGame("Collided with floor. Game Over.");
         }
-    } else if (player.getY < 0) {
+    } else if (player.getY <= minY) {
         player.setVelocity = Vector2.ZERO;
-        player.setY = 0;
+        player.setY = minY;
         if (isCeilingLethal) {
             endGame("Collided with ceiling. Game Over.");
         }
@@ -195,6 +220,8 @@ const updateScaling = () => {
 
     const paddingMultiplier = 1.0; // 1.0 = max width/height (maintaining aspect ratio), < 1.0 = padding
     gameContainer.style.transform = `scale(${xScale * paddingMultiplier})`
+    console.log(`gameContainer.style.transform:`, gameContainer.style.transform);
+    console.log(`parseFloat(gameContainer.style.transform):`, parseFloat(gameContainer.style.transform));
 }
 
 window.onresize = () => {
@@ -221,12 +248,13 @@ const startGame = () => {
     
 }
 
+
+setMainMenuVisible(false);
+gameContainer.appendChild(mainMenu);
+
+
 window.onload = () => {
     updateScaling();
     setDifficulty(currentDifficulty);
     startGame();
 }
-
-
-setMainMenuVisible(false);
-gameContainer.appendChild(mainMenu);
