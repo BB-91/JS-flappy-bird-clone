@@ -34,12 +34,12 @@ game-container {
   align-items: center;
 }
 
-sprite-rect {
+game-object {
   display: inline-block;
   position: absolute;
 }
 
-menu-container {
+game-menu {
   position: absolute;
   display: grid;
   grid-template-columns: 1fr;

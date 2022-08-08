@@ -1,6 +1,4 @@
 "use strict";
-// import { assertNotNull, assertInstancesOf, assertWithinRange, getNewElement, crash, assertDifferentObjects, count, assertIncludes, objIncludes, getImageSize, setupImgLoader } from './lib/Util.js';
-// import { assertNotNull, assertInstancesOf, assertWithinRange, getNewElement, crash, assertDifferentObjects, count, assertIncludes, objIncludes, getImageSize } from './lib/Util.js';
 import { assertNotNull, assertInstancesOf, assertWithinRange, getNewElement, crash, assertDifferentObjects, count, assertIncludes, objIncludes } from './lib/Util.js';
 import { Vector2, vector2 } from './lib/Vector2.js';
 import { Rect2, rect2 } from './lib/Rect2.js';
@@ -8,7 +6,8 @@ import { Color, color } from './lib/Color.js';
 import { GameObj } from './lib/GameObj.js';
 import { gameArea, gameContainer } from './lib/Game.js';
 import * as Physics from './lib/Physics.js';
-import { createMenu, subscribeToBtnClicks } from './lib/GameBtn.js';
+import { subscribeToBtnClicks } from './lib/GameBtn.js';
+import { GameMenu } from './lib/GameMenu.js';
 
 /**@param {HTMLElement} btn - GameBtn element */
 const gameBtnClickListener = (btn) => {
@@ -61,8 +60,9 @@ let walls;
 // -------------------------------------
 
 const initializeVars = () => {
-    mainMenu = createMenu("DIFFICULTY", ...Object.values(DIFFICULTY));
-    // const player = new GameObj({ id: "player", rect2: rect2(PLAYER_START_POS, vector2(16, 16)), imgSrc: PLAYER_IMAGE_PATH })
+    mainMenu = new GameMenu({id: "main-menu", title: "DIFFICULTY", btnStrings: [...Object.values(DIFFICULTY)]})
+    setMainMenuVisible(false);
+
     player = new GameObj({ id: "player", rect2: rect2(PLAYER_START_POS, vector2(16, 16)), imgSrc: PLAYER_IMAGE_PATH, backgroundColor: Color.WHITE })
     floor = getNewFloorOrCeiling("floor");
     ceiling = getNewFloorOrCeiling("ceiling");
@@ -70,7 +70,8 @@ const initializeVars = () => {
     bottomWall = getNewWall("bottom-wall");
     walls = [topWall, bottomWall];
     
-    [ceiling, floor, topWall, bottomWall, player].forEach(obj => {
+
+    [ceiling, floor, topWall, bottomWall, player, mainMenu].forEach(obj => {
         obj.addToGame();
     })
     
@@ -79,9 +80,6 @@ const initializeVars = () => {
     walls.forEach(wall => {
         wall.setX = WALL_SPAWN_X_POS;
     })
-
-    setMainMenuVisible(false);
-    gameContainer.appendChild(mainMenu);
 
     window.addEventListener("keydown", (event) => {
         if (event.key == " " && !event.repeat){ // spacebar
@@ -93,7 +91,7 @@ const initializeVars = () => {
 }
 
 const setMainMenuVisible = (bool) => {
-    mainMenu.style.display = bool ? "grid" : "none";
+    mainMenu.getElement.style.display = bool ? "grid" : "none";
 }
 
 const endGame = (message) => {
@@ -128,12 +126,6 @@ const getNewWall = (wallID) => {
             backgroundColor: Color.RED,
         });
     }
-
-// /** 
-//  * @param {boolean} isFloorObj
-//  * @return {GameObj} Get a new Floor or Ceiling GameObj
-// */
-
 
 /** 
  * @param {string} ceilingOrFloorID
