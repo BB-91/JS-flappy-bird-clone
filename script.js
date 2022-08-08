@@ -83,44 +83,42 @@ const initializeVars = () => {
 
     window.addEventListener("keydown", (event) => {
         if (!event.repeat) {
-            switch (event.key) {
-                case " ":
+            if (isMainMenuVisible()) {
+                switch (event.key) {
+                    case "ArrowUp":
+                    case "w":
+                        mainMenu.offsetFocusedBtnIndex(-1);
+                        break;
+                    case "ArrowDown":
+                    case "s":
+                        mainMenu.offsetFocusedBtnIndex(1);
+                        break;
+                    case "Enter":
+                        mainMenu.getFocusedBtn.click();
+                        break;
+                    default:
+                        console.log(`event.key:`, event.key);
+                        break;
+                }
+            } else {
+                if (event.key == " ") {
                     player.setVelocity = vector2(0, JUMP_FORCE);
-                    break;
-                // case " ":
-                //     player.setVelocity = vector2(0, JUMP_FORCE);
-                //     break;
-
-                case "ArrowUp":
-                case "w":
-                    mainMenu.offsetFocusedBtnIndex(-1);
-                    break;
-                case "ArrowDown":
-                case "s":
-                    mainMenu.offsetFocusedBtnIndex(1);
-                    break;
-                default:
-                    console.log(`event.key:`, event.key);
-                    break;
+                }
             }
         }
 
-        // if (event.key == " " && !event.repeat){ // spacebar
-        //     player.setVelocity = vector2(0, JUMP_FORCE)
-        // }
     })
+}
 
-    // window.addEventListener("keydown", (event) => {
-    //     if (event.key == " " && !event.repeat){ // spacebar
-    //         player.setVelocity = vector2(0, JUMP_FORCE)
-    //     }
-    // })
-
-
+const isMainMenuVisible = () => {
+    return mainMenu.getElement.style.display != "none";
 }
 
 const setMainMenuVisible = (bool) => {
     mainMenu.getElement.style.display = bool ? "grid" : "none";
+    if (bool) {
+        mainMenu.setFocusedBtnIndex = mainMenu.getFocusedBtnIndex;
+    }
 }
 
 const endGame = (message) => {
