@@ -96,9 +96,6 @@ const initializeVars = () => {
                     case "Enter":
                         mainMenu.getFocusedBtn.click();
                         break;
-                    default:
-                        console.log(`event.key:`, event.key);
-                        break;
                 }
             } else {
                 if (event.key == " ") {
@@ -124,7 +121,6 @@ const setMainMenuVisible = (bool) => {
 const endGame = (message) => {
     clearInterval(physicsInterval);
     setMainMenuVisible(true);
-    console.log(`endGame message:`, message);
 }
 
 const tick = () => {
