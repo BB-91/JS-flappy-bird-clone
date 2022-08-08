@@ -1,5 +1,7 @@
 "use strict";
-import { assertNotNull, assertInstancesOf, assertWithinRange, getNewElement, crash, assertDifferentObjects, count, assertIncludes, objIncludes, getImageSize } from './lib/Util.js';
+// import { assertNotNull, assertInstancesOf, assertWithinRange, getNewElement, crash, assertDifferentObjects, count, assertIncludes, objIncludes, getImageSize, setupImgLoader } from './lib/Util.js';
+// import { assertNotNull, assertInstancesOf, assertWithinRange, getNewElement, crash, assertDifferentObjects, count, assertIncludes, objIncludes, getImageSize } from './lib/Util.js';
+import { assertNotNull, assertInstancesOf, assertWithinRange, getNewElement, crash, assertDifferentObjects, count, assertIncludes, objIncludes } from './lib/Util.js';
 import { Vector2, vector2 } from './lib/Vector2.js';
 import { Rect2, rect2 } from './lib/Rect2.js';
 import { Color, color } from './lib/Color.js';
@@ -33,7 +35,7 @@ const CEILING_HEIGHT = FLOOR_HEIGHT;
 
 const PLAYER_START_POS = vector2(4, 64);
 const PLAYER_PIXEL_OUTLINE_THICKNESS = 1; // 1 pixel black outline
-
+const PLAYER_IMAGE_PATH = "./images/FloppyDisk.png"
 
 const DIFFICULTY = {
     Easy: "Easy",
@@ -46,18 +48,53 @@ let currentDifficulty = DIFFICULTY.Easy;
 let wallSpeed = -8; // wall movement speed
 let isFloorLethal = true;
 let isCeilingLethal = true;
+let physicsInterval;
 
-const mainMenu = createMenu("DIFFICULTY", ...Object.values(DIFFICULTY));
+// --- assigned in initializeVars(); ---
+let mainMenu;
+let player;
+let floor;
+let ceiling ;
+let topWall;
+let bottomWall;
+let walls;
+// -------------------------------------
+
+const initializeVars = () => {
+    mainMenu = createMenu("DIFFICULTY", ...Object.values(DIFFICULTY));
+    // const player = new GameObj({ id: "player", rect2: rect2(PLAYER_START_POS, vector2(16, 16)), imgSrc: PLAYER_IMAGE_PATH })
+    player = new GameObj({ id: "player", rect2: rect2(PLAYER_START_POS, vector2(16, 16)), imgSrc: PLAYER_IMAGE_PATH, backgroundColor: Color.WHITE })
+    floor = getNewFloorOrCeiling("floor");
+    ceiling = getNewFloorOrCeiling("ceiling");
+    topWall = getNewWall("top-wall");
+    bottomWall = getNewWall("bottom-wall");
+    walls = [topWall, bottomWall];
+    
+    [ceiling, floor, topWall, bottomWall, player].forEach(obj => {
+        obj.addToGame();
+    })
+    
+    bottomWall.setY = bottomWall.getMaxY;
+    
+    walls.forEach(wall => {
+        wall.setX = WALL_SPAWN_X_POS;
+    })
+
+    setMainMenuVisible(false);
+    gameContainer.appendChild(mainMenu);
+
+    window.addEventListener("keydown", (event) => {
+        if (event.key == " " && !event.repeat){ // spacebar
+            player.setVelocity = vector2(0, JUMP_FORCE)
+        }
+    })
+
+
+}
 
 const setMainMenuVisible = (bool) => {
     mainMenu.style.display = bool ? "grid" : "none";
 }
-
-const PLAYER_IMAGE_PATH = "./images/FloppyDisk.png"
-
-let physicsInterval;
-
-const player = new GameObj({ id: "player", rect2: rect2(PLAYER_START_POS, vector2(16, 16)), imgSrc: PLAYER_IMAGE_PATH, backgroundColor: Color.WHITE })
 
 const endGame = (message) => {
     clearInterval(physicsInterval);
@@ -119,11 +156,7 @@ const getNewFloorOrCeiling = (ceilingOrFloorID) => {
     return obj;
 }
 
-const floor = getNewFloorOrCeiling("floor");
-const ceiling = getNewFloorOrCeiling("ceiling");
-const topWall = getNewWall("top-wall");
-const bottomWall = getNewWall("bottom-wall");
-const walls = [topWall, bottomWall];
+
 
 const setDifficulty = (difficulty) => {
     assertIncludes(difficulty, DIFFICULTY);
@@ -203,15 +236,7 @@ const change_hole_pos = () => {
     bottomWall.setY = holeBottom;
 }
 
-[ceiling, floor, topWall, bottomWall, player].forEach(obj => {
-    obj.addToGame();
-})
 
-bottomWall.setY = bottomWall.getMaxY;
-
-walls.forEach(wall => {
-    wall.setX = WALL_SPAWN_X_POS;
-})
 
 const applyGravity = () => {
     player.offsetVelocity(vector2(0, GRAVITY));
@@ -241,12 +266,6 @@ const applyGravity = () => {
     }
 }
 
-window.addEventListener("keydown", (event) => {
-    if (event.key == " " && !event.repeat){ // spacebar
-        player.setVelocity = vector2(0, JUMP_FORCE)
-    }
-})
-
 const updateScaling = () => {
     const widthToHeightRatio = 0.5625 //  (native resolution: 320x180 -- 16:9) (9/16 = 0.5625)
     const heightToWidthRatio = 1.7778; // (16/9)
@@ -260,10 +279,6 @@ const updateScaling = () => {
 
     const paddingMultiplier = 1.0; // 1.0 = max width/height (maintaining aspect ratio), < 1.0 = padding
     gameContainer.style.transform = `scale(${xScale * paddingMultiplier})`
-}
-
-window.onresize = () => {
-    updateScaling();
 }
 
 const startGame = () => {
@@ -286,12 +301,12 @@ const startGame = () => {
     
 }
 
-
-setMainMenuVisible(false);
-gameContainer.appendChild(mainMenu);
-
+window.onresize = () => {
+    updateScaling();
+}
 
 window.onload = () => {
+    initializeVars();
     updateScaling();
     setDifficulty(currentDifficulty);
     startGame();
