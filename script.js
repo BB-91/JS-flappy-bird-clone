@@ -82,10 +82,39 @@ const initializeVars = () => {
     })
 
     window.addEventListener("keydown", (event) => {
-        if (event.key == " " && !event.repeat){ // spacebar
-            player.setVelocity = vector2(0, JUMP_FORCE)
+        if (!event.repeat) {
+            switch (event.key) {
+                case " ":
+                    player.setVelocity = vector2(0, JUMP_FORCE);
+                    break;
+                // case " ":
+                //     player.setVelocity = vector2(0, JUMP_FORCE);
+                //     break;
+
+                case "ArrowUp":
+                case "w":
+                    mainMenu.offsetFocusedBtnIndex(-1);
+                    break;
+                case "ArrowDown":
+                case "s":
+                    mainMenu.offsetFocusedBtnIndex(1);
+                    break;
+                default:
+                    console.log(`event.key:`, event.key);
+                    break;
+            }
         }
+
+        // if (event.key == " " && !event.repeat){ // spacebar
+        //     player.setVelocity = vector2(0, JUMP_FORCE)
+        // }
     })
+
+    // window.addEventListener("keydown", (event) => {
+    //     if (event.key == " " && !event.repeat){ // spacebar
+    //         player.setVelocity = vector2(0, JUMP_FORCE)
+    //     }
+    // })
 
 
 }

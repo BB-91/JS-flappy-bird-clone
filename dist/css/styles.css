@@ -70,7 +70,7 @@ game-label:hover {
   cursor: default;
 }
 
-game-btn:hover {
+game-btn:hover, game-btn.menu-focused {
   cursor: pointer;
   font-weight: bold;
   animation: pulse-border-color var(--pulse-speed) ease-in-out 0s infinite, pulse-text-shadow var(--pulse-speed) ease-in-out 0s infinite;
