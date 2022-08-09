@@ -80,28 +80,41 @@ game-btn {
     position: absolute;
 }
 
+p { // displays text inside game-label and game-button objects
+    pointer-events: none;
+    user-select: none;
+}
+
 game-label {
+    pointer-events: none; // prevent from blocking mouseover for elements behind label, if label is full-screen size for alignment purposes
     user-select: none;
     border: 2px solid red;
 
     @include inset-box-shadow;
     
-    &:hover {
-        cursor:default;
-    }
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+    &:hover { cursor:default; }
+
+    &.top { align-items: flex-start; }
+    &.bottom { align-items: flex-end; }
+    &.left { justify-content: flex-start; }
+    &.right { justify-content: flex-end; }
 
     &.text-only {
         color: white;
         background-color: transparent;
-        // border: none;
-        // text-align: left;
+        box-shadow: none;
+        padding: 0.25em 0.4em;
+        margin: 0;
     }
 }
 
 game-btn {
     user-select: none;
-    // position: absolute;
-    // &:hover {
     &:hover,
     &.menu-focused {
         cursor: pointer;

@@ -66,17 +66,42 @@ game-btn {
   position: absolute;
 }
 
+p {
+  pointer-events: none;
+  user-select: none;
+}
+
 game-label {
+  pointer-events: none;
   user-select: none;
   border: 2px solid red;
   box-shadow: 2px 2px 0px inset black, 2px -2px 0px inset black, -2px 2px 0px inset black, -2px -2px 0px inset black;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
 }
 game-label:hover {
   cursor: default;
 }
+game-label.top {
+  align-items: flex-start;
+}
+game-label.bottom {
+  align-items: flex-end;
+}
+game-label.left {
+  justify-content: flex-start;
+}
+game-label.right {
+  justify-content: flex-end;
+}
 game-label.text-only {
   color: white;
   background-color: transparent;
+  box-shadow: none;
+  padding: 0.25em 0.4em;
+  margin: 0;
 }
 
 game-btn {

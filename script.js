@@ -49,6 +49,8 @@ let wallSpeed = -8; // wall movement speed
 let isFloorLethal = true;
 let isCeilingLethal = true;
 let physicsInterval;
+let score = 0;
+
 
 // --- assigned in initializeVars(); ---
 let mainMenu;
@@ -58,6 +60,7 @@ let ceiling;
 let topWall;
 let bottomWall;
 let walls;
+let scoreLabel;
 // -------------------------------------
 
 const initializeVars = () => {
@@ -65,7 +68,7 @@ const initializeVars = () => {
         {
             id: "main-menu",
             title: "DIFFICULTY",
-            btnStrings: [...Object.values(DIFFICULTY)]
+            btnStrings: [...Object.values(DIFFICULTY)],
         }
     );
 
@@ -76,7 +79,7 @@ const initializeVars = () => {
             id: "player",
             rect2: rect2(PLAYER_START_POS, vector2(16, 16)),
             imgSrc: PLAYER_IMAGE_PATH,
-            backgroundColor: Color.WHITE
+            backgroundColor: Color.WHITE,
         }
     );
 
@@ -86,18 +89,16 @@ const initializeVars = () => {
     bottomWall = getNewWall("bottom-wall");
     walls = [topWall, bottomWall];
 
-    
-    const scoreCounter = new GameLabel(
+    scoreLabel = new GameLabel(
         {
             id: "score-counter",
-            classList: ["absolute", "text-only"],
+            classList: ["absolute", "text-only", "bottom", "right"],
             text: "score: 0",
-            rect2: rect2(Vector2.ZERO, vector2(120, 40))
+            rect2: rect2(Vector2.ZERO, gameArea),
         }
     );
 
-
-    const gameObjects = [ceiling, floor, topWall, bottomWall, player, mainMenu, scoreCounter];
+    const gameObjects = [ceiling, floor, topWall, bottomWall, player, mainMenu, scoreLabel];
 
     gameObjects.forEach(obj => {
         obj.addToGame();
@@ -233,6 +234,10 @@ const setDifficulty = (difficulty) => {
     currentDifficulty = difficulty;
 }
 
+const updateScoreLabel = () => {
+    scoreLabel.getElement.textContent = `score: ${score}`;
+}
+
 
 const moveWalls = () => { // move walls toward the left edge of the screen, then reset position when offscreen
     let shouldPosReset = false;
@@ -247,6 +252,8 @@ const moveWalls = () => { // move walls toward the left edge of the screen, then
 
     if (shouldPosReset) {
         change_hole_pos();
+        score += 1;
+        updateScoreLabel();
     }
 }
 
@@ -325,6 +332,8 @@ const updateScaling = () => {
 }
 
 const startGame = () => {
+    score = 0;
+    updateScoreLabel();
     setMainMenuVisible(false);
 
     if (walls.length) {
