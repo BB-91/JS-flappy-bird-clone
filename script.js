@@ -8,6 +8,7 @@ import { gameArea, gameContainer } from './lib/Game.js';
 import * as Physics from './lib/Physics.js';
 import { subscribeToBtnClicks } from './lib/GameBtn.js';
 import { GameMenu } from './lib/GameMenu.js';
+import { GameLabel } from './lib/GameLabel.js';
 
 /**@param {HTMLElement} btn - GameBtn element */
 const gameBtnClickListener = (btn) => {
@@ -53,30 +54,57 @@ let physicsInterval;
 let mainMenu;
 let player;
 let floor;
-let ceiling ;
+let ceiling;
 let topWall;
 let bottomWall;
 let walls;
 // -------------------------------------
 
 const initializeVars = () => {
-    mainMenu = new GameMenu({id: "main-menu", title: "DIFFICULTY", btnStrings: [...Object.values(DIFFICULTY)]})
+    mainMenu = new GameMenu(
+        {
+            id: "main-menu",
+            title: "DIFFICULTY",
+            btnStrings: [...Object.values(DIFFICULTY)]
+        }
+    );
+
     setMainMenuVisible(false);
 
-    player = new GameObj({ id: "player", rect2: rect2(PLAYER_START_POS, vector2(16, 16)), imgSrc: PLAYER_IMAGE_PATH, backgroundColor: Color.WHITE })
+    player = new GameObj(
+        {
+            id: "player",
+            rect2: rect2(PLAYER_START_POS, vector2(16, 16)),
+            imgSrc: PLAYER_IMAGE_PATH,
+            backgroundColor: Color.WHITE
+        }
+    );
+
     floor = getNewFloorOrCeiling("floor");
     ceiling = getNewFloorOrCeiling("ceiling");
     topWall = getNewWall("top-wall");
     bottomWall = getNewWall("bottom-wall");
     walls = [topWall, bottomWall];
-    
 
-    [ceiling, floor, topWall, bottomWall, player, mainMenu].forEach(obj => {
+    
+    const scoreCounter = new GameLabel(
+        {
+            id: "score-counter",
+            classList: ["absolute", "text-only"],
+            text: "score: 0",
+            rect2: rect2(Vector2.ZERO, vector2(120, 40))
+        }
+    );
+
+
+    const gameObjects = [ceiling, floor, topWall, bottomWall, player, mainMenu, scoreCounter];
+
+    gameObjects.forEach(obj => {
         obj.addToGame();
     })
-    
+
     bottomWall.setY = bottomWall.getMaxY;
-    
+
     walls.forEach(wall => {
         wall.setX = WALL_SPAWN_X_POS;
     })
@@ -143,22 +171,22 @@ const tick = () => {
 */
 const getNewWall = (wallID) => {
     return new GameObj(
-        { 
+        {
             id: wallID,
             rect2: rect2(Vector2.ZERO, vector2(WALL_WIDTH, (gameArea.getY - HOLE_HEIGHT) / 2.0)),
             backgroundColor: Color.RED,
         });
-    }
+}
 
 /** 
  * @param {string} ceilingOrFloorID
  * @return {GameObj} Get a new Floor or Ceiling GameObj
 */
 const getNewFloorOrCeiling = (ceilingOrFloorID) => {
-    if (!["floor", "ceiling"].includes(ceilingOrFloorID)) {crash("Invalid id", ceilingOrFloorID);}
+    if (!["floor", "ceiling"].includes(ceilingOrFloorID)) { crash("Invalid id", ceilingOrFloorID); }
 
     const obj = new GameObj(
-        { 
+        {
             id: ceilingOrFloorID,
             rect2: rect2(Vector2.ZERO, vector2(gameArea.getX, FLOOR_HEIGHT)),
             backgroundColor: Color.RED,
@@ -229,9 +257,9 @@ const change_hole_pos = () => {
     let holeTop = randomInt % (gameArea.getY - HOLE_HEIGHT + 1);
 
     if (holeTop < MIN_WALL_HEIGHT) { // disable top wall
-        holeTop = -PLAYER_PIXEL_OUTLINE_THICKNESS - 1; 
-        holeTop = -SPACER; 
-        topWall.setHeight = 0; 
+        holeTop = -PLAYER_PIXEL_OUTLINE_THICKNESS - 1;
+        holeTop = -SPACER;
+        topWall.setHeight = 0;
         topWall.setY = holeTop;
     } else {
         topWall.setHeight = holeTop;
@@ -284,7 +312,7 @@ const applyGravity = () => {
 const updateScaling = () => {
     const widthToHeightRatio = 0.5625 //  (native resolution: 320x180 -- 16:9) (9/16 = 0.5625)
     const heightToWidthRatio = 1.7778; // (16/9)
-    let xScale = window.innerWidth/gameArea.getX;
+    let xScale = window.innerWidth / gameArea.getX;
     let scaledWidth = gameArea.getX * xScale;
     const scaledHeight = scaledWidth * widthToHeightRatio;
     if (window.innerHeight < scaledHeight) {
@@ -313,7 +341,7 @@ const startGame = () => {
         player.setVelocity = Vector2.ZERO;
         physicsInterval = setInterval(tick, tickRate); // set tick interveral
     }, 1000); // wait a second for scripts to load
-    
+
 }
 
 window.onresize = () => {

@@ -62,14 +62,26 @@ game-btn {
   font-weight: bold;
 }
 
+.absolute {
+  position: absolute;
+}
+
 game-label {
+  user-select: none;
   border: 2px solid red;
   box-shadow: 2px 2px 0px inset black, 2px -2px 0px inset black, -2px 2px 0px inset black, -2px -2px 0px inset black;
 }
 game-label:hover {
   cursor: default;
 }
+game-label.text-only {
+  color: white;
+  background-color: transparent;
+}
 
+game-btn {
+  user-select: none;
+}
 game-btn:hover, game-btn.menu-focused {
   cursor: pointer;
   font-weight: bold;

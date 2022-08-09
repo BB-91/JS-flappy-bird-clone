@@ -60,8 +60,6 @@ game-menu {
 
 game-label,
 game-btn {
-    // position: absolute;
-    // position: relative;
     color: black;
     background-color: white;
     text-align: center;
@@ -78,16 +76,30 @@ game-btn {
     font-weight: bold;
 }
 
+.absolute {
+    position: absolute;
+}
+
 game-label {
-    // position: absolute;
+    user-select: none;
     border: 2px solid red;
+
     @include inset-box-shadow;
+    
     &:hover {
         cursor:default;
+    }
+
+    &.text-only {
+        color: white;
+        background-color: transparent;
+        // border: none;
+        // text-align: left;
     }
 }
 
 game-btn {
+    user-select: none;
     // position: absolute;
     // &:hover {
     &:hover,
