@@ -66,11 +66,6 @@ game-btn {
   position: absolute;
 }
 
-p {
-  pointer-events: none;
-  user-select: none;
-}
-
 game-label {
   pointer-events: none;
   user-select: none;

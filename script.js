@@ -92,7 +92,7 @@ const initializeVars = () => {
     scoreLabel = new GameLabel(
         {
             id: "score-counter",
-            classList: ["absolute", "text-only", "bottom", "right"],
+            classList: ["absolute", "text-only", "bottom", "left"],
             text: "score: 0",
             rect2: rect2(Vector2.ZERO, gameArea),
         }

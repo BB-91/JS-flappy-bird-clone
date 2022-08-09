@@ -80,11 +80,6 @@ game-btn {
     position: absolute;
 }
 
-p { // displays text inside game-label and game-button objects
-    pointer-events: none;
-    user-select: none;
-}
-
 game-label {
     pointer-events: none; // prevent from blocking mouseover for elements behind label, if label is full-screen size for alignment purposes
     user-select: none;
