@@ -111,7 +111,6 @@ const initializeVars = () => {
         }
     );
 
-
     const gameObjects = [ceiling, floor, topWall, bottomWall, player, mainMenu, scoreLabel, countdownLabel];
 
     gameObjects.forEach(obj => {
@@ -140,13 +139,12 @@ const initializeVars = () => {
                         mainMenu.getFocusedBtn.click();
                         break;
                 }
-            } else {
+            } else if (!isCountdownLabelVisible()){
                 if (event.key == " ") {
                     player.setVelocity = vector2(0, JUMP_FORCE);
                 }
             }
         }
-
     })
 }
 
@@ -159,6 +157,10 @@ const setMainMenuVisible = (bool) => {
     if (bool) {
         mainMenu.setFocusedBtnIndex = mainMenu.getFocusedBtnIndex;
     }
+}
+
+const isCountdownLabelVisible = () => {
+    return countdownLabel.getElement.style.display != "none";
 }
 
 const setCountdownLabelVisible = (bool) => {
