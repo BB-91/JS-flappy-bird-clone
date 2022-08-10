@@ -148,23 +148,41 @@ const initializeVars = () => {
     })
 }
 
-const isMainMenuVisible = () => {
-    return mainMenu.getElement.style.display != "none";
+/**
+ * @param {GameObj} gameObj - GameObj with element container using style "display: grid"
+ * @param {boolean} bool - true: "display: grid" --- false: "display: none"
+*/
+const setGridElementVisibility = (gameObj, bool) => {
+    assertNotNull(gameObj);
+    const gridElement = gameObj.getElement;
+    assertNotNull(gridElement);
+    gridElement.style.display = bool ? "grid" : "none";
 }
 
-const setMainMenuVisible = (bool) => {
-    mainMenu.getElement.style.display = bool ? "grid" : "none";
-    if (bool) {
-        mainMenu.setFocusedBtnIndex = mainMenu.getFocusedBtnIndex;
-    }
+/**
+ * @param {GameObj} gameObj - check if GameObj element style has "display: none"
+*/
+const isElementHidden = (gameObj) => {
+    return gameObj.getElement.style.display == "none";
 }
 
 const isCountdownLabelVisible = () => {
-    return countdownLabel.getElement.style.display != "none";
+    return !isElementHidden(countdownLabel);
+}
+
+const isMainMenuVisible = () => {
+    return !isElementHidden(mainMenu);
 }
 
 const setCountdownLabelVisible = (bool) => {
-    countdownLabel.getElement.style.display = bool ? "grid" : "none";
+    setGridElementVisibility(countdownLabel, bool);
+}
+
+const setMainMenuVisible = (bool) => {
+    setGridElementVisibility(mainMenu, bool);
+    if (bool) {
+        mainMenu.setFocusedBtnIndex = mainMenu.getFocusedBtnIndex;
+    }
 }
 
 const endGame = (message) => {
@@ -219,7 +237,6 @@ const getNewFloorOrCeiling = (ceilingOrFloorID) => {
 
     return obj;
 }
-
 
 
 const setDifficulty = (difficulty) => {
@@ -382,7 +399,6 @@ const countdownToGameStart = () => {
     if (player) {
         player.setPos = PLAYER_START_POS;
     }
-
 
     player.setVelocity = Vector2.ZERO;
 
