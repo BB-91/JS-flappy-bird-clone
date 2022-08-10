@@ -1,11 +1,10 @@
 "use strict";
-import { assertNotNull, assertInstancesOf, assertWithinRange, getNewElement, crash, assertDifferentObjects, count, assertIncludes, objIncludes } from './lib/Util.js';
+import { assertNotNull, assertWithinRange, crash, assertIncludes, objIncludes } from './lib/Util.js';
 import { Vector2, vector2 } from './lib/Vector2.js';
-import { Rect2, rect2 } from './lib/Rect2.js';
-import { Color, color } from './lib/Color.js';
+import { rect2 } from './lib/Rect2.js';
+import { Color } from './lib/Color.js';
 import { GameObj } from './lib/GameObj.js';
 import { gameArea, gameContainer } from './lib/Game.js';
-import * as Physics from './lib/Physics.js';
 import { subscribeToBtnClicks } from './lib/GameBtn.js';
 import { GameMenu } from './lib/GameMenu.js';
 import { GameLabel } from './lib/GameLabel.js';
@@ -185,22 +184,7 @@ const setMainMenuVisible = (bool) => {
     }
 }
 
-const endGame = (message) => {
-    clearInterval(physicsInterval);
-    setMainMenuVisible(true);
-}
 
-const tick = () => {
-    applyGravity();
-    moveWalls();
-    for (let i = 0; i < walls.length; i++) {
-        const wall = walls[i];
-        if (wall.touches(player)) {
-            endGame("Collided with wall. Game Over.");
-            break;
-        }
-    }
-}
 
 
 /** 
@@ -346,13 +330,13 @@ const applyGravity = () => {
         player.setVelocity = Vector2.ZERO;
         player.setY = maxY;
         if (isFloorLethal) {
-            endGame("Collided with floor. Game Over.");
+            endGame();
         }
     } else if (player.getY <= minY) {
         player.setVelocity = Vector2.ZERO;
         player.setY = minY;
         if (isCeilingLethal) {
-            endGame("Collided with ceiling. Game Over.");
+            endGame();
         }
     }
 }
@@ -372,6 +356,18 @@ const updateScaling = () => {
     gameContainer.style.transform = `scale(${xScale * paddingMultiplier})`
 }
 
+
+const tick = () => {
+    applyGravity();
+    moveWalls();
+    for (let i = 0; i < walls.length; i++) {
+        const wall = walls[i];
+        if (wall.touches(player)) {
+            endGame();
+            break;
+        }
+    }
+}
 
 
 const updateCountdown = () => {
@@ -411,6 +407,11 @@ const countdownToGameStart = () => {
 
 const startGame = () => {
     physicsInterval = setInterval(tick, tickRate); // set tick interveral
+}
+
+const endGame = () => {
+    clearInterval(physicsInterval);
+    setMainMenuVisible(true);
 }
 
 window.onresize = () => {
