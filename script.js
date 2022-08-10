@@ -15,11 +15,18 @@ const gameBtnClickListener = (btn) => {
     const btnText = btn.textContent;
     if (objIncludes(btnText, DIFFICULTY)) {
         setDifficulty(btnText);
-        startGame();
+        countdownToGameStart();
     }
 }
 
 subscribeToBtnClicks(gameBtnClickListener);
+
+const DIFFICULTY = {
+    Easy: "Easy",
+    Medium: "Medium",
+    Hard: "Hard",
+    Insane: "Insane",
+}
 
 const FPS = 60;
 const tickRate = (1.0 / FPS) * 1000;
@@ -37,18 +44,14 @@ const PLAYER_START_POS = vector2(4, 64);
 const PLAYER_PIXEL_OUTLINE_THICKNESS = 1; // 1 pixel black outline
 const PLAYER_IMAGE_PATH = "./images/FloppyDisk.png"
 
-const DIFFICULTY = {
-    Easy: "Easy",
-    Medium: "Medium",
-    Hard: "Hard",
-    Insane: "Insane",
-}
-
+const MAX_COUNTDOWN_VALUE = 3;
+let countDownValue = MAX_COUNTDOWN_VALUE;
 let currentDifficulty = DIFFICULTY.Easy;
 let wallSpeed = -8; // wall movement speed
 let isFloorLethal = true;
 let isCeilingLethal = true;
 let physicsInterval;
+let countdownInterval;
 let score = 0;
 
 
@@ -61,6 +64,7 @@ let topWall;
 let bottomWall;
 let walls;
 let scoreLabel;
+let countdownLabel;
 // -------------------------------------
 
 const initializeVars = () => {
@@ -91,14 +95,24 @@ const initializeVars = () => {
 
     scoreLabel = new GameLabel(
         {
-            id: "score-counter",
-            classList: ["absolute", "text-only", "bottom", "left"],
+            id: "score-label",
+            classList: ["absolute", "text-only", "bottom", "right"],
             text: "score: 0",
             rect2: rect2(Vector2.ZERO, gameArea),
         }
     );
 
-    const gameObjects = [ceiling, floor, topWall, bottomWall, player, mainMenu, scoreLabel];
+    countdownLabel = new GameLabel(
+        {
+            id: "countdown-label",
+            classList: ["absolute"],
+            text: "3",
+            rect2: rect2(vector2(4, 16), Vector2.NEGATIVE_ONE),
+        }
+    );
+
+
+    const gameObjects = [ceiling, floor, topWall, bottomWall, player, mainMenu, scoreLabel, countdownLabel];
 
     gameObjects.forEach(obj => {
         obj.addToGame();
@@ -145,6 +159,10 @@ const setMainMenuVisible = (bool) => {
     if (bool) {
         mainMenu.setFocusedBtnIndex = mainMenu.getFocusedBtnIndex;
     }
+}
+
+const setCountdownLabelVisible = (bool) => {
+    countdownLabel.getElement.style.display = bool ? "grid" : "none";
 }
 
 const endGame = (message) => {
@@ -236,6 +254,10 @@ const setDifficulty = (difficulty) => {
 
 const updateScoreLabel = () => {
     scoreLabel.getElement.textContent = `score: ${score}`;
+}
+
+const updateCountdownLabel = () => {
+    countdownLabel.getElement.textContent = `${countDownValue}`;
 }
 
 
@@ -331,7 +353,20 @@ const updateScaling = () => {
     gameContainer.style.transform = `scale(${xScale * paddingMultiplier})`
 }
 
-const startGame = () => {
+
+
+const updateCountdown = () => {
+    countDownValue--;
+    updateCountdownLabel();
+    if (countDownValue <= 0) {
+        setCountdownLabelVisible(false);
+        clearInterval(countdownInterval);
+        countDownValue = MAX_COUNTDOWN_VALUE;
+        startGame();
+    }
+}
+
+const countdownToGameStart = () => {
     score = 0;
     updateScoreLabel();
     setMainMenuVisible(false);
@@ -346,11 +381,18 @@ const startGame = () => {
         player.setPos = PLAYER_START_POS;
     }
 
-    setTimeout(() => {
-        player.setVelocity = Vector2.ZERO;
-        physicsInterval = setInterval(tick, tickRate); // set tick interveral
-    }, 1000); // wait a second for scripts to load
 
+    player.setVelocity = Vector2.ZERO;
+
+    assertWithinRange(0, 5, MAX_COUNTDOWN_VALUE);
+    countDownValue = MAX_COUNTDOWN_VALUE;
+    updateCountdownLabel();
+    setCountdownLabelVisible(true);
+    countdownInterval = setInterval(updateCountdown, 500);
+}
+
+const startGame = () => {
+    physicsInterval = setInterval(tick, tickRate); // set tick interveral
 }
 
 window.onresize = () => {
@@ -361,5 +403,5 @@ window.onload = () => {
     initializeVars();
     updateScaling();
     setDifficulty(currentDifficulty);
-    startGame();
+    countdownToGameStart();
 }

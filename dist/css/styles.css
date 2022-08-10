@@ -22,6 +22,10 @@ body {
   background-color: rgb(19, 19, 19);
 }
 
+.absolute {
+  position: absolute;
+}
+
 game-container {
   display: block;
   width: 320px;
@@ -60,10 +64,7 @@ game-btn {
   border-radius: 5px;
   padding: 0.2em 2em;
   font-weight: bold;
-}
-
-.absolute {
-  position: absolute;
+  text-align: center;
 }
 
 game-label {
@@ -94,6 +95,7 @@ game-label.right {
 game-label.text-only {
   color: white;
   background-color: transparent;
+  border: none;
   box-shadow: none;
   padding: 0.25em 0.4em;
   margin: 0;
