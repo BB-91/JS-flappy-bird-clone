@@ -8,7 +8,7 @@ import { gameArea, gameContainer } from './lib/Game.js';
 import { subscribeToBtnClicks } from './lib/GameBtn.js';
 import { GameMenu } from './lib/GameMenu.js';
 import { GameLabel } from './lib/GameLabel.js';
-// import { playImpactSound, playNextJumpSound } from './lib/SamplePlayer.js';
+import { playImpactSound, playNextJumpSound } from './lib/SamplePlayer.js';
 
 /**@param {HTMLElement} btn - GameBtn element */
 const gameBtnClickListener = (btn) => {
@@ -141,7 +141,7 @@ const initializeVars = () => {
                 }
             } else if (!isCountdownLabelVisible()){
                 if (event.key == " ") { // spacebar
-                    // playNextJumpSound();
+                    playNextJumpSound();
                     player.setVelocity = vector2(0, JUMP_FORCE);
                 }
             }
@@ -410,7 +410,7 @@ const startGame = () => {
 }
 
 const endGame = () => {
-    // playImpactSound();
+    playImpactSound();
     clearInterval(physicsInterval);
     setMainMenuVisible(true);
 }
